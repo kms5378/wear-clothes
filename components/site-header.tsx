@@ -13,6 +13,7 @@ export function SiteHeader() {
           <ShoppingBag aria-hidden="true" size={17} />
           Cart
         </Link>
+        <Link href="/login">Login</Link>
         <Link href="/admin">
           <UserRound aria-hidden="true" size={17} />
           Admin

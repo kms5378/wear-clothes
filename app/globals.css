@@ -302,6 +302,15 @@ h2 {
   text-transform: none;
 }
 
+.agent-form input {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  min-height: 44px;
+  padding: 0 12px;
+  text-transform: none;
+}
+
 .proposal-preview pre {
   background: var(--charcoal);
   color: var(--paper);
