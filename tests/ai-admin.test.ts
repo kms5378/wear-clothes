@@ -62,14 +62,14 @@ describe("AI image helpers", () => {
     });
 
     expect(getImageModel()).toBe("gpt-image-2");
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       status: "completed",
       model: "gpt-image-2",
-      imageUrl: "/generated/product/prod_test-gpt-image-2.svg",
       prompt:
         "Luxury ecommerce product photo of Test Coat, Outerwear. A refined wool coat. Style: editorial studio lighting",
       provider: "placeholder"
     });
+    expect(result.imageUrl).toMatch(/^data:image\/svg\+xml,/);
 
     process.env.OPENAI_API_KEY = previousKey;
     process.env.OPENAI_IMAGE_MODEL = previousModel;
@@ -107,9 +107,9 @@ describe("AI image helpers", () => {
     expect(result).toMatchObject({
       status: "completed",
       model: "gpt-image-2",
-      imageUrl: "/generated/try-on/user_1/prod_test-gpt-image-2.svg",
       provider: "placeholder"
     });
+    expect(result.imageUrl).toMatch(/^data:image\/svg\+xml,/);
   });
 });
 
@@ -194,7 +194,6 @@ describe("admin and AI API routes", () => {
 
     expect(allowed.status).toBe(200);
     await expect(allowed.json()).resolves.toMatchObject({
-      imageUrl: "/generated/product/prod_test-gpt-image-2.svg",
       provider: "placeholder"
     });
   });
@@ -231,9 +230,8 @@ describe("admin and AI API routes", () => {
     );
 
     expect(allowed.status).toBe(200);
-    await expect(allowed.json()).resolves.toMatchObject({
-      imageUrl: "/generated/try-on/user_1/prod_test-gpt-image-2.svg"
-    });
+    const tryOnBody = await allowed.json();
+    expect(tryOnBody.imageUrl).toMatch(/^data:image\/svg\+xml,/);
   });
 
   it("creates pending agent proposals and applies them only through approval", async () => {

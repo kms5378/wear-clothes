@@ -41,7 +41,7 @@ async function readFormBody(request: Request) {
     consent: form.get("consent") === "true",
     upload:
       photo instanceof File
-        ? { name: photo.name, type: photo.type, size: photo.size }
+        ? { name: photo.name, type: photo.type, size: photo.size, file: photo }
         : undefined
   };
 }
