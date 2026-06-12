@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 
 import type { Product } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
@@ -10,6 +11,38 @@ type ProductDetailProps = {
 };
 
 export function ProductDetail({ product }: ProductDetailProps) {
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [resultUrl, setResultUrl] = useState("");
+  const [message, setMessage] = useState("");
+
+  async function createTryOn() {
+    if (!photo || !consent) {
+      setMessage("Upload a photo and confirm consent first.");
+      return;
+    }
+
+    const form = new FormData();
+    form.set("userId", "demo_customer");
+    form.set("role", "customer");
+    form.set("productId", product.id);
+    form.set("productImageUrl", product.imageUrl);
+    form.set("consent", "true");
+    form.set("photo", photo);
+
+    setMessage("Generating private try-on image...");
+    const response = await fetch("/api/ai/try-on", { method: "POST", body: form });
+    const data = await response.json();
+
+    if (!response.ok) {
+      setMessage(data.error ?? "Try-on generation failed.");
+      return;
+    }
+
+    setResultUrl(data.imageUrl);
+    setMessage("Try-on image ready.");
+  }
+
   return (
     <section className="product-detail">
       <div className="detail-gallery">
@@ -48,11 +81,34 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <p>Photo consent is required before upload. Your original photo is never shown publicly.</p>
           <label className="file-label">
             Upload photo
-            <input accept="image/png,image/jpeg,image/webp" type="file" />
+            <input
+              accept="image/png,image/jpeg,image/webp"
+              type="file"
+              onChange={(event) => setPhoto(event.currentTarget.files?.[0] ?? null)}
+            />
           </label>
-          <button className="button secondary" type="button">
+          <label className="check-label">
+            <input
+              checked={consent}
+              onChange={(event) => setConsent(event.currentTarget.checked)}
+              type="checkbox"
+            />
+            I confirm private AI try-on generation consent.
+          </label>
+          <button className="button secondary" type="button" onClick={createTryOn}>
             Create AI try-on
           </button>
+          {message ? <p role="status">{message}</p> : null}
+          {resultUrl ? (
+            <Image
+              className="try-on-result"
+              src={resultUrl}
+              alt="Generated AI try-on result"
+              width={320}
+              height={400}
+              unoptimized
+            />
+          ) : null}
         </div>
       </div>
     </section>

@@ -1,3 +1,5 @@
+import OpenAI from "openai";
+
 export type ImageJobStatus = "completed" | "error";
 
 export type GeneratedImage = {
@@ -59,10 +61,18 @@ export async function generateProductImage(input: ProductImageInput): Promise<Ge
     };
   }
 
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const response = await client.images.generate({
+    model,
+    prompt,
+    size: "1024x1024"
+  } as never);
+  const image = response.data?.[0];
+
   return {
     status: "completed",
     model,
-    imageUrl: `/generated/product/${safeSegment(input.productId)}-${safeSegment(model)}.svg`,
+    imageUrl: image?.url ?? (image?.b64_json ? `data:image/png;base64,${image.b64_json}` : `/generated/product/${safeSegment(input.productId)}-${safeSegment(model)}.svg`),
     prompt,
     provider: "openai"
   };

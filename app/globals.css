@@ -266,6 +266,22 @@ h2 {
   gap: 14px;
 }
 
+.check-label {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.try-on-result {
+  aspect-ratio: 4 / 5;
+  background: #ddd3c2;
+  max-width: 260px;
+  object-fit: cover;
+  width: 100%;
+}
+
 .admin-list,
 .agent-form,
 .proposal-preview {
